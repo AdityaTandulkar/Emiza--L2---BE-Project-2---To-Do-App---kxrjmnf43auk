@@ -56,6 +56,7 @@ const createTask = async (req, res) => {
     const { heading, description, token } = req.body;
     //Write your code here.
     try {
+        console.log(token)
         const {userId} = jwt.verify(token, JWT_SECRET);
 
         const task = new Tasks({
