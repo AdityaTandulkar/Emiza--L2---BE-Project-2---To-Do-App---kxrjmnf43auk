@@ -1,4 +1,5 @@
 var mongoose = require("mongoose");
+const {userModel} = require("./user");
 
 /*
 Complete your other field here
@@ -14,8 +15,18 @@ Complete your other field here
 
 var taskSchema = mongoose.Schema({
   //Write your code here.
+  task : {type : String, required : true},
+  description : {type : String, required : true},
+  status : {type : String, enum : ["pending", "done"], default : "pending"},
+  creator_id : {
+    type : String,
+    user : {
+      type : mongoose.Schema.Types.ObjectId,
+      ref : "User"
+    }
+  }
 },
-{ /* ... */ }
+{ timestamps: true }
 );
 
 

@@ -1,7 +1,7 @@
-const Users   = require("../models/user.js");
+const Users = require("../models/user.js");
 const jwt = require("jsonwebtoken");
-const Tasks   = require("../models/task.js");
-const bcrypt  = require('bcrypt');
+const Tasks = require("../models/task.js");
+const bcrypt = require('bcrypt');
 const { valid } = require("joi");
 const JWT_SECRET = "newtonSchool";
 
@@ -49,12 +49,35 @@ json =
 
 */
 
-const createTask =async (req, res) => {
+const createTask = async (req, res) => {
 
     //creator_id is user id who have created this task.
 
-    const { heading, description, token  } = req.body;
+    const { heading, description, token } = req.body;
     //Write your code here.
+    try {
+        const { userId } = jwt.verify(token, JWT_SECRET);
+
+        const task = new Tasks({
+            task: heading,
+            description,
+            creator_id: userId
+        })
+
+        const newTask = await task.save();
+
+        return res.status(200).json({
+            status: "success",
+            message: "Task added successfully",
+            task_id: newTask.creator_id
+        })
+    }
+    catch (err) {
+        return res.status(404).json({
+            message: 'Invalid token',
+            status: 'fail'
+        })
+    }
 
 }
 
@@ -101,6 +124,17 @@ const getdetailTask = async (req, res) => {
 
     const task_id = req.body.task_id;
     //Write your code here.
+    const task = await Tasks.findById(task_id);
+
+    if (!task) return res.status(404).json({
+        message: "Task not found",
+        status: "fail"
+    })
+
+    return res.send(200).json({
+        status : "success",
+        data : task
+    })
 }
 
 module.exports = { createTask, getdetailTask };
