@@ -56,7 +56,6 @@ const createTask = async (req, res) => {
     const { heading, description, token } = req.body;
     //Write your code here.
     try {
-        console.log(token)
         const {userId} = jwt.verify(token, JWT_SECRET);
 
         const task = new Tasks({
@@ -126,13 +125,10 @@ const getdetailTask = async (req, res) => {
     const task_id = req.body.task_id;
     //Write your code here.
     const task = await Tasks.findById(task_id);
+    
+    if (!task) return res.status(404).json({message: "Task not found",status: "fail"})
 
-    if (!task) return res.status(404).json({
-        message: "Task not found",
-        status: "fail"
-    })
-
-    return res.send(200).json({
+    return res.status(200).json({
         status : "success",
         data : task
     })

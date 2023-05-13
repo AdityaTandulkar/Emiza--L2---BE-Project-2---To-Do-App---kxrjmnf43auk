@@ -7,7 +7,7 @@ function errorHandler(ctrlFunc){
             return res.status(404).json({
                 message : err.message,
                 status : "fail"
-            })
+            });
         }
     }
 }
