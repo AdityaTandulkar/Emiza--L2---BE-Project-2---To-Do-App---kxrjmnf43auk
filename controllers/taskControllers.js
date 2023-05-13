@@ -62,8 +62,7 @@ const createTask = async (req, res) => {
             task: heading,
             description,
             creator_id : userId
-        })
-        console.log(token)
+        });
 
         const newTask = await task.save();
 

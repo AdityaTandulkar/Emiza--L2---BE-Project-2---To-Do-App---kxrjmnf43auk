@@ -12,7 +12,7 @@ Complete your other field here
 */
 
 
-var taskSchema = mongoose.Schema({
+var taskSchema = new mongoose.Schema({
   //Write your code here.
   task : {type : String, required : true},
   description : {type : String, required : true},
