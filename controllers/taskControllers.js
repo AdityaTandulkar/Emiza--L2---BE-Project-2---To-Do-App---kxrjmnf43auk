@@ -61,7 +61,7 @@ const createTask = async (req, res) => {
         const task = new Tasks({
             task: heading,
             description,
-            creator_id: userId
+            creator_id: userid
         })
 
         const newTask = await task.save();
