@@ -1,5 +1,4 @@
 var mongoose = require("mongoose");
-const {userModel} = require("./user");
 
 /*
 Complete your other field here
