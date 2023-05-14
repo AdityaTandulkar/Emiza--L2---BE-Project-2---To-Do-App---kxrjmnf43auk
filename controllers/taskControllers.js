@@ -1,9 +1,10 @@
-const Users = require("../models/user.js");
+const Users   = require("../models/user.js");
 const jwt = require("jsonwebtoken");
-const Tasks = require("../models/task.js");
-const bcrypt = require('bcrypt');
+const Tasks   = require("../models/task.js");
+const bcrypt  = require('bcrypt');
 const { valid } = require("joi");
 const JWT_SECRET = "newtonSchool";
+const { json } = require("express");
 
 /*
 
@@ -49,36 +50,38 @@ json =
 
 */
 
-const createTask = async (req, res) => {
+const createTask =async (req, res) => {
 
     //creator_id is user id who have created this task.
 
-    const { heading, description, token } = req.body;
+    const { heading, description, token  } = req.body;
     //Write your code here.
-    try {
-        const {userId} = jwt.verify(token, JWT_SECRET);
+        try{
+            let tokenData = jwt.verify(token, JWT_SECRET);
+            let userId = tokenData.userId;
 
-        const task = new Tasks({
-            task: heading,
-            description,
-            creator_id : userId
-        });
+            let userData = await Users.find();
+            let findData = userData.filter((data) => data._id == userId);
 
-        const newTask = await task.save();
+            if(findData.length > 0){
+                let newTask = new Tasks({
+                    heading,
+                    description,
+                    creator_id: userId
+                })
 
-        return res.status(200).json({
-            status: "success",
-            message: "Task added successfully",
-            task_id: newTask.creator_id
-        })
-    }
-    catch (err) {
-        return res.status(404).json({
-            message: 'Invalid token',
-            status: 'fail'
-        })
-    }
-
+                try{
+                    let task = await Tasks.create(newTask);
+                    res.status(200).json({status: 'success', "message": 'Task added successfully', "task_id": task._id})
+                } catch (error) {
+                    res.status(404).json({message: error.message, status: 'fail'})
+                }
+            } else{
+                res.status(404).json({message: 'Invalid token', status: 'fail'})
+            }
+        } catch (error) {
+            res.status(404).json({message: error.message, status: 'fail'})
+        }
 }
 
 /*
@@ -124,14 +127,24 @@ const getdetailTask = async (req, res) => {
 
     const task_id = req.body.task_id;
     //Write your code here.
-    const task = await Tasks.findById(task_id);
-    
-    if (!task) return res.status(404).json({message: "Task not found",status: "fail"})
+    const token = req.body.token;
 
-    return res.status(200).json({
-        status : "success",
-        data : task
-    })
+    try {
+        let tokenData = jwt.verify(token, JWT_SECRET);
+        let userId = tokenData.userId;
+
+        let userData = await Users.find();
+        let findData = userData.filter((data) => data._id == userId);
+
+        if(findData.length > 0){
+            let taskData = await Tasks.findById(task_id);
+            res.status(200).json({status: 'success', data: taskData});
+        } else {
+            res.status(404).json({message: 'Invalid token', status: 'fail'})
+        }
+    } catch (error) {
+        res.status(404).json({message: error.message, status: 'fail'})
+    }
 }
 
 module.exports = { createTask, getdetailTask };
